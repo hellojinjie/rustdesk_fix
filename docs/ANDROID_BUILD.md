@@ -31,6 +31,9 @@ docker run --rm -it \
     -v $PWD:/build/rustdesk \
     -v rustdesk-cargo-cache:/root/.cargo/git \
     -v rustdesk-cargo-registry:/root/.cargo/registry \
+    -v rustdesk-vcpkg-cache:/opt/vcpkg/installed \
+    -v rustdesk-gradle-cache:/root/.gradle \
+    -v rustdesk-pub-cache:/root/.pub-cache \
     rustdesk-android-builder arm64-v8a
 
 # armeabi-v7a（32 位 ARM，老旧设备）
@@ -38,6 +41,9 @@ docker run --rm -it \
     -v $PWD:/build/rustdesk \
     -v rustdesk-cargo-cache:/root/.cargo/git \
     -v rustdesk-cargo-registry:/root/.cargo/registry \
+    -v rustdesk-vcpkg-cache:/opt/vcpkg/installed \
+    -v rustdesk-gradle-cache:/root/.gradle \
+    -v rustdesk-pub-cache:/root/.pub-cache \
     rustdesk-android-builder armeabi-v7a
 
 # x86_64（64 位模拟器）
@@ -45,6 +51,9 @@ docker run --rm -it \
     -v $PWD:/build/rustdesk \
     -v rustdesk-cargo-cache:/root/.cargo/git \
     -v rustdesk-cargo-registry:/root/.cargo/registry \
+    -v rustdesk-vcpkg-cache:/opt/vcpkg/installed \
+    -v rustdesk-gradle-cache:/root/.gradle \
+    -v rustdesk-pub-cache:/root/.pub-cache \
     rustdesk-android-builder x86_64
 
 # x86（32 位模拟器）
@@ -52,6 +61,9 @@ docker run --rm -it \
     -v $PWD:/build/rustdesk \
     -v rustdesk-cargo-cache:/root/.cargo/git \
     -v rustdesk-cargo-registry:/root/.cargo/registry \
+    -v rustdesk-vcpkg-cache:/opt/vcpkg/installed \
+    -v rustdesk-gradle-cache:/root/.gradle \
+    -v rustdesk-pub-cache:/root/.pub-cache \
     rustdesk-android-builder x86
 ```
 
@@ -70,6 +82,7 @@ docker run --rm -it \
     -v "$PWD":/build/rustdesk   \
     -v rustdesk-cargo-cache:/root/.cargo/git   \
     -v rustdesk-cargo-registry:/root/.cargo/registry   \
+    -v rustdesk-vcpkg-cache:/opt/vcpkg/installed   \
     -v rustdesk-gradle-cache:/root/.gradle   \
     -v rustdesk-pub-cache:/root/.pub-cache   \
     rustdesk-android-builder x86_64
@@ -115,6 +128,9 @@ docker run --rm -it \
     -v $PWD:/build/rustdesk \
     -v rustdesk-cargo-cache:/root/.cargo/git \
     -v rustdesk-cargo-registry:/root/.cargo/registry \
+    -v rustdesk-vcpkg-cache:/opt/vcpkg/installed \
+    -v rustdesk-gradle-cache:/root/.gradle \
+    -v rustdesk-pub-cache:/root/.pub-cache \
     --entrypoint /bin/bash \
     rustdesk-android-builder
 
@@ -130,7 +146,7 @@ cd flutter && flutter clean && flutter packages pub get && flutter build apk --r
 ### 清理缓存卷
 
 ```bash
-docker volume rm rustdesk-cargo-cache rustdesk-cargo-registry
+docker volume rm rustdesk-cargo-cache rustdesk-cargo-registry rustdesk-vcpkg-cache rustdesk-gradle-cache rustdesk-pub-cache
 ```
 
 ## 开发调试工作流
@@ -185,6 +201,9 @@ docker run --rm -it \
     -v $PWD:/build/rustdesk \
     -v rustdesk-cargo-cache:/root/.cargo/git \
     -v rustdesk-cargo-registry:/root/.cargo/registry \
+    -v rustdesk-vcpkg-cache:/opt/vcpkg/installed \
+    -v rustdesk-gradle-cache:/root/.gradle \
+    -v rustdesk-pub-cache:/root/.pub-cache \
     --entrypoint /bin/bash \
     rustdesk-android-builder
 
@@ -234,6 +253,9 @@ docker run --rm \
     -v $PWD:/build/rustdesk \
     -v rustdesk-cargo-cache:/root/.cargo/git \
     -v rustdesk-cargo-registry:/root/.cargo/registry \
+    -v rustdesk-vcpkg-cache:/opt/vcpkg/installed \
+    -v rustdesk-gradle-cache:/root/.gradle \
+    -v rustdesk-pub-cache:/root/.pub-cache \
     --entrypoint /bin/bash \
     rustdesk-android-builder -c "
 cd /build/rustdesk && \
