@@ -27,6 +27,8 @@ case "$ABI" in
     FLUTTER_TARGET="android-x86"
     FEATURES="flutter"
     NDK_LIB="i686-linux-android"
+    export CFLAGS="-DBROKEN_CLANG_ATOMICS"
+    export CXXFLAGS="-DBROKEN_CLANG_ATOMICS"
     ;;
   *)
     echo "Usage: $0 {arm64-v8a|armeabi-v7a|x86_64|x86}"
@@ -38,20 +40,35 @@ echo "==> Building for ABI: $ABI (Rust target: $RUST_TARGET)"
 
 cd /build/rustdesk
 
-# Step 1: Build vcpkg dependencies
-echo "==> [1/4] Building vcpkg dependencies..."
+# Step 1: Generate flutter-rust-bridge files when they were not restored from CI artifacts.
+if [ ! -f src/bridge_generated.rs ] || [ ! -f flutter/lib/generated_bridge.dart ]; then
+    echo "==> [1/5] Generating flutter-rust-bridge files..."
+    pushd flutter
+    flutter packages pub get
+    popd
+    flutter_rust_bridge_codegen \
+        --rust-input ./src/flutter_ffi.rs \
+        --dart-output ./flutter/lib/generated_bridge.dart \
+        --c-output ./flutter/macos/Runner/bridge_generated.h
+    cp ./flutter/macos/Runner/bridge_generated.h ./flutter/ios/Runner/bridge_generated.h
+else
+    echo "==> [1/5] flutter-rust-bridge files already exist, skipping generation."
+fi
+
+# Step 2: Build vcpkg dependencies
+echo "==> [2/5] Building vcpkg dependencies..."
 bash flutter/build_android_deps.sh "$ABI"
 
-# Step 2: Build Rust native library
-echo "==> [2/4] Building Rust native library..."
+# Step 3: Build Rust native library
+echo "==> [3/5] Building Rust native library..."
 cargo ndk --platform 21 \
     --target "$RUST_TARGET" \
     --bindgen \
     build --locked --release \
     --features "$FEATURES"
 
-# Step 3: Copy .so files to jniLibs
-echo "==> [3/4] Copying .so files to jniLibs..."
+# Step 4: Copy .so files to jniLibs
+echo "==> [4/5] Copying .so files to jniLibs..."
 mkdir -p "flutter/android/app/src/main/jniLibs/$ABI"
 cp "target/$RUST_TARGET/release/liblibrustdesk.so" \
    "flutter/android/app/src/main/jniLibs/$ABI/librustdesk.so"
@@ -62,8 +79,10 @@ cp "${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/${
 "${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip" \
     "flutter/android/app/src/main/jniLibs/$ABI/"*
 
-# Step 4: Build Flutter APK
-echo "==> [4/4] Building Flutter APK..."
+# Step 5: Build Flutter APK
+echo "==> [5/5] Building Flutter APK..."
+sed -i "s/org.gradle.jvmargs=-Xmx1024M/org.gradle.jvmargs=-Xmx2g/g" ./flutter/android/gradle.properties
+sed -i "s/signingConfigs.release/signingConfigs.debug/g" ./flutter/android/app/build.gradle
 cd flutter
 flutter clean
 flutter packages pub get

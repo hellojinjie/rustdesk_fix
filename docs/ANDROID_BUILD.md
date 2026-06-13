@@ -55,6 +55,26 @@ docker run --rm -it \
     rustdesk-android-builder x86
 ```
 
+# 注意：如果你在中国大陆，可能需要配置代理才能成功拉取依赖和构建。可以在 `docker run` 命令中添加以下环境变量：
+
+```bash
+docker run --rm -it \
+    --add-host=host.docker.internal:host-gateway \
+    -e HTTP_PROXY=http://host.docker.internal:1087 \
+    -e HTTPS_PROXY=http://host.docker.internal:1087 \  
+    -e ALL_PROXY=http://host.docker.internal:1087   \
+    -e http_proxy=http://host.docker.internal:1087   \
+    -e https_proxy=http://host.docker.internal:1087   \
+    -e all_proxy=http://host.docker.internal:1087   \
+    -e GRADLE_OPTS="-Xmx4g -Dhttp.proxyHost=host.docker.internal -Dhttp.proxyPort=1087 -Dhttps.proxyHost=host.docker.internal -Dhttps.proxyPort=1087"   \
+    -v "$PWD":/build/rustdesk   \
+    -v rustdesk-cargo-cache:/root/.cargo/git   \
+    -v rustdesk-cargo-registry:/root/.cargo/registry   \
+    -v rustdesk-gradle-cache:/root/.gradle   \
+    -v rustdesk-pub-cache:/root/.pub-cache   \
+    rustdesk-android-builder x86_64
+```
+
 ## APK 产物位置
 
 编译完成后，APK 文件位于：
