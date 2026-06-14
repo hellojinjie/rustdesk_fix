@@ -73,7 +73,7 @@ docker run --rm -it \
 docker run --rm -it \
     --add-host=host.docker.internal:host-gateway \
     -e HTTP_PROXY=http://host.docker.internal:1087 \
-    -e HTTPS_PROXY=http://host.docker.internal:1087 \  
+    -e HTTPS_PROXY=http://host.docker.internal:1087 \
     -e ALL_PROXY=http://host.docker.internal:1087   \
     -e http_proxy=http://host.docker.internal:1087   \
     -e https_proxy=http://host.docker.internal:1087   \
